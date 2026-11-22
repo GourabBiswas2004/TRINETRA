@@ -1,0 +1,17 @@
+{
+  "name": "SEHAT-ERS Fall Protection",
+  "short_name": "SEHAT-ERS",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#090D16",
+  "theme_color": "#090D16",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "app_logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

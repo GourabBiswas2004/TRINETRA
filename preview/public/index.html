@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SEHAT-ERS • Edge-First Fall Protection</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#090D16">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" href="app_logo.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- External Desktop Simulation Controls -->
+  <header class="preview-header-bar">
+    <div class="preview-badge">
+      <span class="pulse-dot"></span>
+      <span>SEHAT Health-Tech System (v1.0)</span>
+    </div>
+    <button class="mode-toggle-btn" id="toggleFrameBtn">Toggle Phone Frame</button>
+  </header>
+
+  <!-- Device Shell (Mobile Mockup) -->
+  <main class="device-shell" id="deviceShell">
+    
+    <!-- Status Bar (iOS / Android Dynamic Header) -->
+    <section class="android-status-bar" aria-label="Device Status">
+      <span id="liveClock">10:24</span>
+      <div class="status-bar-icons">
+        <span>5G</span>
+        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2">
+          <path d="M5 12.55a11 11 0 0 1 14.08 0"></path>
+          <path d="M1.42 9a16 16 0 0 1 21.16 0"></path>
+          <path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
+          <line x1="12" y1="20" x2="12.01" y2="20"></line>
+        </svg>
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2">
+          <rect x="2" y="7" width="16" height="10" rx="2" ry="2"></rect>
+          <line x1="22" y1="11" x2="22" y2="13"></line>
+          <rect x="4" y="9" width="10" height="6" fill="currentColor"></rect>
+        </svg>
+      </div>
+    </section>
+
+    <!-- Scrollable Viewport Content -->
+    <div class="app-viewport">
+      
+      <!-- Sleek App Header with Logo & Status Pill -->
+      <header class="app-header-row">
+        <div class="header-brand">
+          <img src="app_logo.png" alt="SEHAT-ERS Logo" class="app-logo-img">
+          <div class="app-titles">
+            <h1 class="app-title-text">SEHAT-ERS</h1>
+            <span class="app-subtitle-text">Edge-First Safe Fall Protection</span>
+          </div>
+        </div>
+        <div class="header-status-pill">
+          <span class="status-mini-dot"></span>
+          <span>100 Hz Local</span>
+        </div>
+      </header>
+
+      <!-- Pill Segmented Control (Tabs) -->
+      <nav class="tab-container" aria-label="Mode Tabs">
+        <button class="tab-btn active" id="tabMainBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+          </svg>
+          <span>Location</span>
+        </button>
+        <button class="tab-btn" id="tabTestingBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M10 2v7.31"></path>
+            <path d="M14 9.3V2"></path>
+            <path d="M8.5 2h7"></path>
+            <path d="M14 9.3a6.5 6.5 0 1 1-4 0"></path>
+            <path d="M5.52 16h12.96"></path>
+          </svg>
+          <span>Sensors & Lab</span>
+        </button>
+      </nav>
+
+      <!-- ============================================================ -->
+      <!-- TAB 1: SMART LOCATION & POWER SAVER                          -->
+      <!-- ============================================================ -->
+      <div id="tabMainContent">
+        <div class="section-banner cyan">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+          </svg>
+          <span>Smart Location & Power Saver</span>
+        </div>
+
+        <!-- Hero Radar Card -->
+        <section class="card-dark">
+          <div class="radar-box">
+            <canvas id="radarCanvas"></canvas>
+          </div>
+          <div class="geofence-status-banner" id="geoBanner">
+            <span>🟢</span> INSIDE HOME SAFE ZONE • SENSORS PAUSED
+          </div>
+          <button class="btn-action btn-green" id="toggleGeoBtn">
+            <span>🛡️</span> LOCATION AUTO-PROTECTION: ACTIVE
+          </button>
+        </section>
+
+        <!-- Safe Home Zone Setup Card -->
+        <section class="card-surface">
+          <div class="card-title">Safe Home Zone</div>
+          
+          <!-- 2-Column Metrics -->
+          <div class="metric-grid-2col">
+            <div class="metric-tile">
+              <div class="metric-label">Home Coordinates</div>
+              <div class="metric-val" id="homeCoordsText">28.6139° N, 77.2090° E</div>
+            </div>
+            <div class="metric-tile">
+              <div class="metric-label">Live Distance</div>
+              <div class="metric-val highlight-cyan" id="homeDistText">14 m • Inside Safe Zone</div>
+            </div>
+          </div>
+
+          <!-- Secondary Action Buttons -->
+          <div class="btn-group-row">
+            <button class="btn-secondary" id="setCurrentHomeBtn">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                <circle cx="12" cy="10" r="3"></circle>
+              </svg>
+              <span>Set Current</span>
+            </button>
+            <button class="btn-secondary" id="openMapBtn">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2">
+                <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon>
+                <line x1="8" y1="2" x2="8" y2="18"></line>
+                <line x1="16" y1="6" x2="16" y2="22"></line>
+              </svg>
+              <span>Pin on Map</span>
+            </button>
+          </div>
+
+          <!-- Refined Radius Slider -->
+          <div class="radius-control-box">
+            <div class="radius-header">
+              <span class="radius-title">Safe Zone Radius</span>
+              <span class="radius-badge" id="radiusValueLabel">100 meters</span>
+            </div>
+            <input type="range" min="50" max="500" step="25" value="100" class="modern-slider" id="radiusRange">
+            <div class="radius-caption">
+              Within this radius, IMU motion sensors pause automatically to maximize battery life.
+            </div>
+          </div>
+        </section>
+
+        <!-- Emergency Caregiver Contact Card (Profile Style) -->
+        <div class="contact-clickable-card" id="openContactCard">
+          <div class="contact-profile-wrap">
+            <div class="contact-avatar" id="contactAvatar1">SM</div>
+            <div class="contact-info">
+              <span class="contact-label">Emergency Relative</span>
+              <span class="contact-name" id="contactName1">Sarah Miller <span id="contactRel1" style="font-weight:400; color:#94A3B8;">(Spouse)</span></span>
+              <span class="contact-phone" id="contactPhone1">+1 (555) 234-5678</span>
+            </div>
+          </div>
+          <div class="contact-chevron">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Subtle Battery Benefit Note -->
+        <div class="power-benefit-box">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="#10B981" stroke-width="2.2">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+          </svg>
+          <div>
+            <strong>Power Optimization:</strong> Sensors poll at ~100 Hz only when outside home, extending battery life by up to <strong>5x</strong>.
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- TAB 2: SENSORS & LAB DIAGNOSTICS                            -->
+      <!-- ============================================================ -->
+      <div id="tabTestingContent" style="display: none;">
+        <div class="section-banner amber">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2">
+            <line x1="18" y1="20" x2="18" y2="10"></line>
+            <line x1="12" y1="20" x2="12" y2="4"></line>
+            <line x1="6" y1="20" x2="6" y2="14"></line>
+          </svg>
+          <span>Sensors & Lab Diagnostics</span>
+        </div>
+
+        <!-- Unified Status & Probability Gauge Hero Card -->
+        <section class="card-dark">
+          <div id="sensorNoticeBanner" style="font-size:11.5px; padding:8px 12px; background:rgba(14,165,233,0.08); border:1px solid rgba(14,165,233,0.25); border-radius:12px; color:#38BDF8; margin-bottom:10px; display:flex; align-items:center; justify-content:space-between;">
+            <span id="sensorStateText">📱 Sensor Status: Monitoring</span>
+            <button id="sensorTestTriggerBtn" class="btn-secondary" style="padding:3px 9px; font-size:10.5px; margin:0;">Test Shake</button>
+          </div>
+
+          <div class="service-status-banner running" id="serviceStatusBanner">
+            FALL MONITORING ACTIVE (100 Hz)
+          </div>
+
+          <div class="gauge-box">
+            <svg class="gauge-svg" viewBox="0 0 120 120">
+              <circle class="gauge-bg" cx="60" cy="60" r="48"></circle>
+              <circle class="gauge-fill" id="gaugeCircle" cx="60" cy="60" r="48"
+                      stroke-dasharray="301.59" stroke-dashoffset="290"></circle>
+              <text class="gauge-text" id="gaugeText" x="60" y="64">2.4%</text>
+              <text class="gauge-label" x="60" y="78">FALL PROBABILITY</text>
+            </svg>
+          </div>
+          <div class="prob-flag-text" id="probFlagText">
+            Latest Probability: 2.40% • Streak: 0/2 Flags
+          </div>
+        </section>
+
+        <!-- Live Motion Waveform Card -->
+        <section class="card-surface">
+          <div class="card-title" style="display:flex; justify-content:space-between; align-items:center;">
+            <span>Live Motion Stream</span>
+            <span style="font-size:11px; font-weight:600; color:var(--accent-cyan);">|acc| Cyan • |gyro| Amber</span>
+          </div>
+          <div class="waveform-box">
+            <canvas id="waveCanvas"></canvas>
+          </div>
+          <div class="chips-row">
+            <div class="chip" id="accChip">⚡ Acc: 101.2 Hz</div>
+            <div class="chip" id="gyroChip">🔄 Gyro: 99.8 Hz</div>
+            <div class="chip" id="inferChip">🧠 Infer: 120/m</div>
+          </div>
+        </section>
+
+        <!-- Contact Card Duplicate for Tab 2 -->
+        <div class="contact-clickable-card" id="openContactCard2">
+          <div class="contact-profile-wrap">
+            <div class="contact-avatar" id="contactAvatar2">SM</div>
+            <div class="contact-info">
+              <span class="contact-label">Emergency Relative</span>
+              <span class="contact-name" id="contactName2">Sarah Miller <span id="contactRel2" style="font-weight:400; color:#94A3B8;">(Spouse)</span></span>
+              <span class="contact-phone" id="contactPhone2">+1 (555) 234-5678</span>
+            </div>
+          </div>
+          <div class="contact-chevron">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Lab Controls Section -->
+        <section class="self-test-card">
+          <div class="card-title">Lab Controls & Simulation</div>
+
+          <!-- Primary Toggle Monitoring Button -->
+          <button class="btn-action btn-green" id="toggleMonitoringBtn">
+            STOP MONITORING SERVICE
+          </button>
+
+          <!-- Controlled Simulation Button -->
+          <button class="btn-action btn-amber-sim" id="simFallBtn">
+            Simulate Controlled Fall (Voice 'HELP' Triage)
+          </button>
+
+          <!-- Self Test & Pocket Mode -->
+          <div style="margin-top: 10px;">
+            <button class="btn-action btn-blue" id="runSelfTestBtn">
+              Run Self-Test (Motion & Audio Golden)
+            </button>
+            <div class="self-test-output" id="selfTestResult">
+              Self-test: Ready to run (5/5 assets loaded)
+            </div>
+          </div>
+
+          <button class="btn-action btn-slate" id="pocketModeBtn" style="margin-top: 10px;">
+            Pocket Mode (10s Countdown Lock)
+          </button>
+        </section>
+      </div>
+
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- PERSISTENT BOTTOM NAVIGATION DOCK (iOS / Android Style)     -->
+    <!-- ============================================================ -->
+    <nav class="bottom-nav-dock" aria-label="Bottom Navigation">
+      <div class="nav-dock-items">
+        <button class="nav-dock-btn" id="openLogsBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+            <polyline points="10 9 9 9 8 9"></polyline>
+          </svg>
+          <span>Logs</span>
+        </button>
+        
+        <button class="nav-dock-btn" id="openSettingsBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+          <span>Settings</span>
+        </button>
+
+        <button class="nav-dock-btn" id="openAboutBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+          </svg>
+          <span>About</span>
+        </button>
+      </div>
+      <div class="home-indicator"></div>
+    </nav>
+
+    <!-- ============================================================ -->
+    <!-- EMERGENCY FULLSCREEN ALERT OVERLAY                           -->
+    <!-- ============================================================ -->
+    <div class="alert-overlay" id="alertOverlay">
+      <div class="alert-icon-ring">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+          <line x1="12" y1="9" x2="12" y2="13"></line>
+          <line x1="12" y1="17" x2="12.01" y2="17"></line>
+        </svg>
+      </div>
+      <div class="alert-title">FALL DETECTED</div>
+      <div class="alert-countdown" id="alertTimer">30</div>
+      <div class="alert-prompt">
+        Listening for voice command: <strong>"HELP"</strong>...<br>
+        Emergency call will be placed automatically when countdown completes.
+      </div>
+      <button class="btn-cancel-alert" id="dismissAlertBtn">I'M OK (CANCEL)</button>
+      <button class="btn-immediate-call" id="callNowBtn">🚨 CALL RELATIVE NOW</button>
+    </div>
+
+    <!-- Bottom Sheet Modal Component -->
+    <div class="modal-overlay" id="sheetOverlay">
+      <div class="modal-sheet">
+        <div class="sheet-handle"></div>
+        <div class="modal-header-row">
+          <div class="modal-title" id="sheetTitle">Modal Title</div>
+          <button class="modal-close-btn" id="closeSheetBtn">✕</button>
+        </div>
+        <div id="sheetContent"></div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Toast Notification -->
+  <aside class="toast-notice" id="toastNotice" role="alert">Toast Notice</aside>
+
+  <script src="app.js"></script>
+</body>
+</html>
