@@ -1,59 +1,72 @@
 /* ==========================================================================
-   SEHAT-ERS • Simple, Beautiful & Calm Health-Tech Mobile UI
+   SEHAT-ERS • Ultra-Premium, Simple & Intuitive Mobile Health Experience
+   Inspired by Apple Health, Linear & Oura Ring Design Systems
    ========================================================================== */
 
-:root {
-  /* Core Obsidian & Midnight Palette */
-  --bg-app: #0B0F19;
-  --bg-card: #121826;
-  --bg-card-elevated: #182236;
-  --bg-surface: #1E293B;
-  --bg-surface-hover: #26354D;
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
-  /* Calming Accents */
+:root {
+  /* Ultra-Deep Obsidian Titanium Canvas */
+  --bg-app: #080B11;
+  --bg-card: rgba(18, 24, 38, 0.72);
+  --bg-card-solid: #121826;
+  --bg-card-inner: rgba(10, 14, 22, 0.6);
+  --bg-card-elevated: #1A2338;
+  --bg-pill: rgba(255, 255, 255, 0.05);
+  --bg-pill-hover: rgba(255, 255, 255, 0.09);
+
+  /* Calibrated Health-Tech Accents */
   --accent-cyan: #38BDF8;
-  --accent-teal: #0EA5E9;
+  --accent-cyan-glow: rgba(56, 189, 248, 0.25);
   --accent-emerald: #10B981;
   --accent-emerald-soft: rgba(16, 185, 129, 0.12);
+  --accent-emerald-glow: rgba(16, 185, 129, 0.35);
   --accent-amber: #F59E0B;
   --accent-amber-soft: rgba(245, 158, 11, 0.12);
   --accent-red: #EF4444;
   --accent-red-soft: rgba(239, 68, 68, 0.14);
 
-  /* Typography */
-  --text-primary: #FFFFFF;
+  /* Typography Hierarchy */
+  --text-white: #FFFFFF;
+  --text-primary: #F8FAFC;
   --text-secondary: #94A3B8;
   --text-muted: #64748B;
 
-  /* Borders & Shadows */
-  --border-subtle: 1px solid rgba(255, 255, 255, 0.07);
-  --border-highlight: 1px solid rgba(56, 189, 248, 0.25);
-  --glass-nav: rgba(11, 15, 25, 0.88);
-  --card-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  /* Specular Hairline Highlights & Depth */
+  --border-specular: 1px solid rgba(255, 255, 255, 0.08);
+  --border-subtle: 1px solid rgba(255, 255, 255, 0.05);
+  --border-accent: 1px solid rgba(56, 189, 248, 0.3);
+  --card-shadow: 0 12px 36px -10px rgba(0, 0, 0, 0.65), inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
+  --glass-dock: rgba(8, 11, 17, 0.85);
 }
 
-/* Base Styles */
+/* Base Reset & Typography */
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body {
-  background-color: #050811;
+  background-color: #030509;
+  background-image: radial-gradient(circle at 50% 0%, rgba(14, 165, 233, 0.08) 0%, transparent 55%),
+                    radial-gradient(circle at 80% 90%, rgba(16, 185, 129, 0.05) 0%, transparent 45%);
   color: var(--text-primary);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  padding: 20px 16px;
+  padding: 18px 16px;
   overflow-x: hidden;
 }
 
-/* Desktop Header Controls */
+/* ==========================================================================
+   Desktop Preview Header Bar
+   ========================================================================== */
 .preview-header-bar {
   width: 100%;
   max-width: 410px;
@@ -62,10 +75,11 @@ body {
   align-items: center;
   margin-bottom: 12px;
   padding: 8px 14px;
-  background: rgba(18, 24, 38, 0.7);
-  backdrop-filter: blur(16px);
+  background: rgba(18, 24, 38, 0.65);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border-radius: 14px;
-  border: var(--border-subtle);
+  border: var(--border-specular);
   font-size: 12px;
   color: var(--text-secondary);
 }
@@ -76,6 +90,7 @@ body {
   gap: 8px;
   font-weight: 500;
   color: #E2E8F0;
+  letter-spacing: -0.2px;
 }
 
 .pulse-dot {
@@ -83,17 +98,17 @@ body {
   height: 7px;
   background: var(--accent-emerald);
   border-radius: 50%;
-  box-shadow: 0 0 8px var(--accent-emerald);
-  animation: pulseDot 2s infinite ease-in-out;
+  box-shadow: 0 0 10px var(--accent-emerald);
+  animation: pulseLive 2s infinite ease-in-out;
 }
 
-@keyframes pulseDot {
+@keyframes pulseLive {
   0%, 100% { transform: scale(1); opacity: 1; }
   50% { transform: scale(0.85); opacity: 0.5; }
 }
 
 .mode-toggle-btn {
-  background: var(--bg-surface);
+  background: rgba(255, 255, 255, 0.06);
   border: var(--border-subtle);
   color: #CBD5E1;
   padding: 5px 12px;
@@ -101,49 +116,79 @@ body {
   cursor: pointer;
   font-size: 11px;
   font-weight: 600;
-  transition: all 0.2s ease;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .mode-toggle-btn:hover {
-  background: var(--bg-surface-hover);
+  background: rgba(255, 255, 255, 0.12);
   color: #FFFFFF;
 }
 
 /* ==========================================================================
-   Device Shell (Sleek Smartphone Frame)
+   Device Shell (iPhone 16 Pro / Pixel 9 Titanium Mockup)
    ========================================================================== */
 .device-shell {
   width: 100%;
-  max-width: 400px;
-  height: 840px;
+  max-width: 396px;
+  height: 836px;
   background: var(--bg-app);
-  border-radius: 46px;
-  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.95), 0 0 0 11px #161D2B, 0 0 0 13px #242E42;
+  border-radius: 48px;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1),
+              0 32px 70px -15px rgba(0, 0, 0, 0.95),
+              0 0 0 10px #151B27,
+              0 0 0 12px #222B3D;
   display: flex;
   flex-direction: column;
   overflow: hidden;
   position: relative;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .device-shell.fullscreen-mode {
   max-width: 520px;
   height: 94vh;
   border-radius: 20px;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7);
+  box-shadow: 0 15px 45px rgba(0, 0, 0, 0.8);
 }
 
-/* Status Bar */
+/* Dynamic Island Bezel */
+.dynamic-island {
+  position: absolute;
+  top: 9px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 96px;
+  height: 24px;
+  background: #000000;
+  border-radius: 20px;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.island-camera {
+  width: 9px;
+  height: 9px;
+  background: #0F172A;
+  border: 1.5px solid #1E293B;
+  border-radius: 50%;
+}
+
+/* Top Status Bar */
 .android-status-bar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 14px 24px 6px;
+  padding: 13px 26px 4px;
   font-size: 12.5px;
   font-weight: 600;
   color: #94A3B8;
   user-select: none;
   z-index: 10;
+  margin-top: 2px;
 }
 
 .status-bar-icons {
@@ -153,12 +198,14 @@ body {
   font-size: 11px;
 }
 
-/* Scrollable Viewport */
+/* ==========================================================================
+   Scrollable App Viewport
+   ========================================================================== */
 .app-viewport {
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 6px 16px 84px; /* Space for bottom dock */
+  padding: 6px 16px 82px; /* Generous bottom spacing for floating dock */
   scroll-behavior: smooth;
 }
 
@@ -171,29 +218,29 @@ body {
 }
 
 /* ==========================================================================
-   Header (Calm, Modern & Minimal)
+   Sleek Minimal Header
    ========================================================================== */
 .app-header-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 12px;
-  padding: 4px 2px;
+  padding: 2px 2px;
 }
 
 .header-brand {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 11px;
 }
 
 .app-logo-img {
-  width: 40px;
-  height: 40px;
+  width: 38px;
+  height: 38px;
   border-radius: 11px;
   object-fit: cover;
-  box-shadow: 0 4px 14px rgba(14, 165, 233, 0.25);
-  border: 1px solid rgba(56, 189, 248, 0.2);
+  box-shadow: 0 4px 14px rgba(14, 165, 233, 0.28);
+  border: 1px solid rgba(56, 189, 248, 0.25);
 }
 
 .app-titles {
@@ -202,7 +249,7 @@ body {
 }
 
 .app-title-text {
-  font-size: 20px;
+  font-size: 19px;
   font-weight: 800;
   letter-spacing: -0.4px;
   color: #FFFFFF;
@@ -210,22 +257,24 @@ body {
 }
 
 .app-subtitle-text {
-  font-size: 11px;
+  font-size: 10.5px;
   color: var(--text-secondary);
   font-weight: 500;
+  letter-spacing: -0.1px;
 }
 
 .header-status-pill {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 5px 10px;
+  padding: 4px 10px;
   background: var(--accent-emerald-soft);
-  border: 1px solid rgba(16, 185, 129, 0.25);
+  border: 1px solid rgba(16, 185, 129, 0.28);
   border-radius: 20px;
-  font-size: 11px;
+  font-size: 10.5px;
   font-weight: 600;
   color: #34D399;
+  letter-spacing: -0.1px;
 }
 
 .status-mini-dot {
@@ -233,23 +282,24 @@ body {
   height: 6px;
   background: var(--accent-emerald);
   border-radius: 50%;
+  box-shadow: 0 0 8px var(--accent-emerald);
 }
 
 /* ==========================================================================
-   Pill Segmented Tab Control
+   Pill Segmented Tab Control (Apple Health Style)
    ========================================================================== */
 .tab-container {
   display: flex;
-  background: #0E1422;
+  background: #0E131F;
   padding: 3px;
   border-radius: 14px;
-  margin-bottom: 14px;
+  margin-bottom: 12px;
   border: var(--border-subtle);
 }
 
 .tab-btn {
   flex: 1;
-  padding: 9px 12px;
+  padding: 8px 12px;
   border: none;
   background: transparent;
   color: var(--text-secondary);
@@ -260,8 +310,9 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 7px;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  gap: 6px;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  letter-spacing: -0.1px;
 }
 
 .tab-btn svg {
@@ -271,18 +322,18 @@ body {
 }
 
 .tab-btn.active {
-  background: var(--bg-card-elevated);
+  background: #182133;
   color: #FFFFFF;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
-/* Section Subheader Banner */
+/* Section Header Banners */
 .section-banner {
-  font-size: 11px;
+  font-size: 10.5px;
   font-weight: 700;
-  letter-spacing: 0.4px;
+  letter-spacing: 0.5px;
   text-transform: uppercase;
-  margin-bottom: 10px;
+  margin-bottom: 9px;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -292,35 +343,37 @@ body {
 .section-banner.amber { color: var(--accent-amber); }
 
 /* ==========================================================================
-   Cards & Layout
+   Luxury Glass Cards
    ========================================================================== */
 .card-dark, .card-surface, .self-test-card {
-  background: var(--bg-card);
+  background: linear-gradient(180deg, rgba(20, 27, 43, 0.75) 0%, rgba(13, 18, 30, 0.9) 100%);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border-radius: 20px;
-  padding: 16px;
-  margin-bottom: 12px;
-  border: var(--border-subtle);
+  padding: 15px 16px;
+  margin-bottom: 11px;
+  border: var(--border-specular);
   box-shadow: var(--card-shadow);
   position: relative;
 }
 
 .card-title {
-  font-size: 14px;
+  font-size: 13.5px;
   font-weight: 700;
   color: #FFFFFF;
   letter-spacing: -0.2px;
   margin-bottom: 10px;
 }
 
-/* Radar Pulse Container */
+/* Radar Pulse Canvas Box */
 .radar-box {
   width: 100%;
-  height: 180px;
+  height: 172px;
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: radial-gradient(circle at center, rgba(14, 165, 233, 0.08) 0%, transparent 68%);
+  background: radial-gradient(circle at center, rgba(14, 165, 233, 0.1) 0%, transparent 68%);
 }
 
 #radarCanvas {
@@ -329,14 +382,14 @@ body {
   border-radius: 12px;
 }
 
-/* Geofence Status Banner Capsule */
+/* Geofence Status Pill Capsule */
 .geofence-status-banner {
   background: var(--accent-emerald-soft);
   border: 1px solid rgba(16, 185, 129, 0.22);
   border-radius: 24px;
-  padding: 8px 14px;
+  padding: 7px 14px;
   text-align: center;
-  font-size: 11.5px;
+  font-size: 11px;
   font-weight: 600;
   color: #34D399;
   margin-top: 10px;
@@ -344,14 +397,15 @@ body {
   align-items: center;
   justify-content: center;
   gap: 6px;
+  letter-spacing: -0.1px;
 }
 
-/* Action Buttons (Refined, Clean & Subtle) */
+/* Unified Action Buttons */
 .btn-action {
   width: 100%;
-  padding: 12px 14px;
+  padding: 11px 14px;
   border-radius: 12px;
-  font-size: 12.5px;
+  font-size: 12px;
   font-weight: 600;
   cursor: pointer;
   display: flex;
@@ -359,7 +413,7 @@ body {
   justify-content: center;
   gap: 8px;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  margin-top: 10px;
+  margin-top: 9px;
   letter-spacing: -0.1px;
 }
 
@@ -368,7 +422,7 @@ body {
 }
 
 .btn-action.btn-green {
-  background: var(--accent-emerald-soft);
+  background: rgba(16, 185, 129, 0.12);
   color: #34D399;
   border: 1px solid rgba(16, 185, 129, 0.3);
   box-shadow: 0 2px 8px rgba(16, 185, 129, 0.1);
@@ -390,13 +444,13 @@ body {
 }
 
 .btn-action.btn-slate {
-  background: var(--bg-surface);
+  background: rgba(255, 255, 255, 0.05);
   color: #94A3B8;
   border: var(--border-subtle);
 }
 
 .btn-action.btn-slate:hover {
-  background: var(--bg-surface-hover);
+  background: rgba(255, 255, 255, 0.09);
   color: #FFFFFF;
 }
 
@@ -415,18 +469,18 @@ body {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 8px;
-  margin-bottom: 10px;
+  margin-bottom: 9px;
 }
 
 .metric-tile {
-  background: #0D1321;
+  background: var(--bg-card-inner);
   border: var(--border-subtle);
   border-radius: 14px;
-  padding: 10px 12px;
+  padding: 9px 12px;
 }
 
 .metric-label {
-  font-size: 10.5px;
+  font-size: 10px;
   font-weight: 600;
   text-transform: uppercase;
   color: var(--text-muted);
@@ -452,16 +506,16 @@ body {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 8px;
-  margin-bottom: 10px;
+  margin-bottom: 9px;
 }
 
 .btn-secondary {
-  padding: 9px 12px;
-  background: var(--bg-surface);
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.05);
   border: var(--border-subtle);
   border-radius: 11px;
   color: #CBD5E1;
-  font-size: 12px;
+  font-size: 11.5px;
   font-weight: 600;
   cursor: pointer;
   display: flex;
@@ -472,7 +526,7 @@ body {
 }
 
 .btn-secondary:hover {
-  background: var(--bg-surface-hover);
+  background: rgba(255, 255, 255, 0.09);
   color: #FFFFFF;
 }
 
@@ -480,13 +534,13 @@ body {
   transform: scale(0.97);
 }
 
-/* Radius Slider Control Box */
+/* Modern Radius Slider Control Box */
 .radius-control-box {
-  background: #0D1321;
+  background: var(--bg-card-inner);
   border: var(--border-subtle);
   border-radius: 14px;
-  padding: 12px 14px;
-  margin-top: 4px;
+  padding: 11px 13px;
+  margin-top: 3px;
 }
 
 .radius-header {
@@ -497,40 +551,40 @@ body {
 }
 
 .radius-title {
-  font-size: 12px;
+  font-size: 11.5px;
   font-weight: 600;
   color: #E2E8F0;
 }
 
 .radius-badge {
-  font-size: 11px;
+  font-size: 10.5px;
   font-weight: 700;
   color: var(--accent-cyan);
   background: rgba(14, 165, 233, 0.12);
   border: 1px solid rgba(14, 165, 233, 0.25);
-  padding: 2px 8px;
+  padding: 2px 7px;
   border-radius: 20px;
 }
 
 .modern-slider {
   width: 100%;
   height: 4px;
-  background: #1E293B;
+  background: #1C2436;
   border-radius: 4px;
   outline: none;
   appearance: none;
   -webkit-appearance: none;
   cursor: pointer;
-  margin: 8px 0;
+  margin: 7px 0;
 }
 
 .modern-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
-  width: 18px;
-  height: 18px;
+  width: 17px;
+  height: 17px;
   border-radius: 50%;
   background: #38BDF8;
-  border: 3px solid #0B0F19;
+  border: 3px solid #080B11;
   box-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
   cursor: pointer;
   transition: transform 0.1s;
@@ -541,29 +595,29 @@ body {
 }
 
 .radius-caption {
-  font-size: 11px;
+  font-size: 10.5px;
   color: var(--text-muted);
   line-height: 1.35;
   margin-top: 4px;
 }
 
-/* Caregiver Profile Card */
+/* Caregiver VIP Profile Card */
 .contact-clickable-card {
-  background: var(--bg-card);
+  background: linear-gradient(180deg, rgba(20, 27, 43, 0.75) 0%, rgba(13, 18, 30, 0.9) 100%);
   border-radius: 18px;
-  padding: 13px 16px;
-  margin-bottom: 12px;
+  padding: 12px 15px;
+  margin-bottom: 11px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border: var(--border-subtle);
+  border: var(--border-specular);
   box-shadow: var(--card-shadow);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .contact-clickable-card:hover {
-  background: var(--bg-surface);
+  background: rgba(26, 35, 56, 0.9);
   border-color: rgba(255, 255, 255, 0.12);
   transform: translateY(-1px);
 }
@@ -575,16 +629,16 @@ body {
 }
 
 .contact-avatar {
-  width: 38px;
-  height: 38px;
+  width: 36px;
+  height: 36px;
   background: linear-gradient(135deg, #1E293B, #0F172A);
-  border: 1px solid rgba(56, 189, 248, 0.3);
+  border: 1px solid rgba(56, 189, 248, 0.35);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--accent-cyan);
-  font-size: 12px;
+  font-size: 11.5px;
   font-weight: 700;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
@@ -595,7 +649,7 @@ body {
 }
 
 .contact-label {
-  font-size: 10px;
+  font-size: 9.5px;
   text-transform: uppercase;
   color: var(--text-muted);
   font-weight: 600;
@@ -603,7 +657,7 @@ body {
 }
 
 .contact-name {
-  font-size: 13px;
+  font-size: 12.5px;
   font-weight: 700;
   color: #FFFFFF;
 }
@@ -625,19 +679,19 @@ body {
   color: #FFFFFF;
 }
 
-/* Power Benefit Explainer */
+/* Subtle Battery Saver Note */
 .power-benefit-box {
-  background: rgba(16, 185, 129, 0.05);
+  background: rgba(16, 185, 129, 0.04);
   border-radius: 12px;
-  padding: 10px 12px;
-  font-size: 11px;
+  padding: 9px 12px;
+  font-size: 10.5px;
   color: var(--text-secondary);
-  line-height: 1.45;
-  border: 1px solid rgba(16, 185, 129, 0.14);
+  line-height: 1.4;
+  border: 1px solid rgba(16, 185, 129, 0.12);
   display: flex;
   align-items: flex-start;
   gap: 8px;
-  margin-bottom: 12px;
+  margin-bottom: 11px;
 }
 
 .power-benefit-box svg {
@@ -649,14 +703,14 @@ body {
    Tab 2: Sensors & Lab Components
    ========================================================================== */
 .service-status-banner {
-  padding: 10px 14px;
+  padding: 9px 12px;
   border-radius: 12px;
-  font-size: 12.5px;
+  font-size: 12px;
   font-weight: 700;
   text-align: center;
-  background: var(--bg-surface);
+  background: rgba(255, 255, 255, 0.05);
   color: var(--text-secondary);
-  margin-bottom: 10px;
+  margin-bottom: 9px;
   letter-spacing: 0.2px;
   border: var(--border-subtle);
   transition: all 0.3s ease;
@@ -679,8 +733,8 @@ body {
 }
 
 .gauge-svg {
-  width: 146px;
-  height: 146px;
+  width: 142px;
+  height: 142px;
   filter: drop-shadow(0 0 10px rgba(56, 189, 248, 0.15));
 }
 
@@ -701,7 +755,7 @@ body {
 }
 
 .gauge-text {
-  font-size: 24px;
+  font-size: 23px;
   font-weight: 800;
   fill: #FFFFFF;
   text-anchor: middle;
@@ -709,7 +763,7 @@ body {
 }
 
 .gauge-label {
-  font-size: 8.5px;
+  font-size: 8px;
   font-weight: 600;
   letter-spacing: 0.6px;
   fill: var(--text-muted);
@@ -717,18 +771,18 @@ body {
 }
 
 .prob-flag-text {
-  font-size: 11.5px;
+  font-size: 11px;
   color: var(--text-secondary);
-  margin-top: 4px;
+  margin-top: 3px;
   text-align: center;
   font-weight: 500;
 }
 
-/* Waveform Canvas & 3-Column Chips Bar */
+/* Oscilloscope Waveform Box */
 .waveform-box {
   width: 100%;
-  height: 115px;
-  margin: 6px 0 10px;
+  height: 112px;
+  margin: 5px 0 9px;
   border-radius: 12px;
   overflow: hidden;
   border: var(--border-subtle);
@@ -737,22 +791,22 @@ body {
 #waveCanvas {
   width: 100%;
   height: 100%;
-  background: #0B0F19;
+  background: #080B11;
 }
 
 .chips-row {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   gap: 6px;
-  background: #0D1321;
-  padding: 8px;
+  background: var(--bg-card-inner);
+  padding: 7px;
   border-radius: 12px;
   border: var(--border-subtle);
 }
 
 .chip {
   text-align: center;
-  font-size: 11px;
+  font-size: 10.5px;
   font-weight: 600;
   color: #CBD5E1;
   padding: 3px;
@@ -763,29 +817,29 @@ body {
 }
 
 .self-test-output {
-  font-size: 11.5px;
+  font-size: 11px;
   color: var(--text-muted);
-  margin-top: 8px;
+  margin-top: 7px;
   line-height: 1.4;
-  padding: 8px 10px;
-  background: #0D1321;
+  padding: 7px 10px;
+  background: var(--bg-card-inner);
   border-radius: 10px;
   border: var(--border-subtle);
 }
 
 /* ==========================================================================
-   Persistent Bottom Navigation Dock (Apple Health Style)
+   Bottom Navigation Dock (Apple Health Style Glassmorphism)
    ========================================================================== */
 .bottom-nav-dock {
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
-  background: var(--glass-nav);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-top: var(--border-subtle);
-  padding: 8px 16px 6px;
+  background: var(--glass-dock);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-top: var(--border-specular);
+  padding: 7px 16px 5px;
   display: flex;
   flex-direction: column;
   z-index: 50;
@@ -805,13 +859,13 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 3px;
+  gap: 2.5px;
   font-size: 10px;
   font-weight: 600;
   cursor: pointer;
   padding: 4px 14px;
   border-radius: 10px;
-  transition: all 0.2s ease;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .nav-dock-btn svg {
@@ -837,7 +891,7 @@ body {
 .home-indicator {
   width: 120px;
   height: 4px;
-  background: rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.25);
   border-radius: 999px;
   margin: 6px auto 2px;
 }
@@ -857,23 +911,23 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 30px 24px;
+  padding: 28px 24px;
   text-align: center;
-  animation: dangerStrobe 1.2s infinite alternate ease-in-out;
+  animation: dangerPulse 1.2s infinite alternate ease-in-out;
 }
 
 .alert-overlay.active {
   display: flex;
 }
 
-@keyframes dangerStrobe {
-  0% { background: #3B0707; }
-  100% { background: #641010; }
+@keyframes dangerPulse {
+  0% { background: #350606; }
+  100% { background: #5E0D0D; }
 }
 
 .alert-icon-ring {
-  width: 84px;
-  height: 84px;
+  width: 82px;
+  height: 82px;
   border-radius: 50%;
   background: #DC2626;
   display: flex;
@@ -881,47 +935,47 @@ body {
   justify-content: center;
   box-shadow: 0 0 35px #EF4444;
   margin-bottom: 16px;
-  animation: pulseRing 0.8s infinite;
+  animation: pulseIconRing 0.8s infinite;
 }
 
 .alert-icon-ring svg {
-  width: 42px;
-  height: 42px;
+  width: 40px;
+  height: 40px;
   stroke: #FFFFFF;
 }
 
-@keyframes pulseRing {
+@keyframes pulseIconRing {
   0%, 100% { transform: scale(1); }
   50% { transform: scale(1.08); }
 }
 
 .alert-title {
-  font-size: 26px;
+  font-size: 25px;
   font-weight: 900;
   color: #FFFFFF;
   letter-spacing: 0.5px;
 }
 
 .alert-countdown {
-  font-size: 56px;
+  font-size: 54px;
   font-weight: 900;
   color: #FEF08A;
-  margin: 8px 0;
+  margin: 6px 0;
   font-variant-numeric: tabular-nums;
   letter-spacing: -1px;
 }
 
 .alert-prompt {
-  font-size: 13.5px;
+  font-size: 13px;
   color: #FECACA;
-  margin-bottom: 24px;
-  max-width: 270px;
+  margin-bottom: 22px;
+  max-width: 260px;
   line-height: 1.45;
 }
 
 .btn-cancel-alert {
   width: 100%;
-  padding: 15px;
+  padding: 14px;
   background: #10B981;
   border: none;
   border-radius: 14px;
@@ -929,7 +983,7 @@ body {
   font-size: 15px;
   font-weight: 700;
   cursor: pointer;
-  margin-bottom: 10px;
+  margin-bottom: 9px;
   box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4);
   transition: transform 0.1s;
 }
@@ -940,7 +994,7 @@ body {
 
 .btn-immediate-call {
   width: 100%;
-  padding: 13px;
+  padding: 12px;
   background: rgba(0, 0, 0, 0.35);
   border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 14px;
@@ -964,9 +1018,9 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.75);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: rgba(0, 0, 0, 0.78);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   z-index: 90;
   display: none;
   align-items: flex-end;
@@ -982,11 +1036,11 @@ body {
   background: #0E1422;
   border-top-left-radius: 26px;
   border-top-right-radius: 26px;
-  padding: 12px 20px 32px;
+  padding: 12px 18px 30px;
   overflow-y: auto;
-  border-top: var(--border-subtle);
-  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.8);
-  animation: slideUpModal 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  border-top: var(--border-specular);
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.85);
+  animation: slideUpModal 0.24s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes slideUpModal {
@@ -997,28 +1051,28 @@ body {
 .sheet-handle {
   width: 36px;
   height: 4px;
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.22);
   border-radius: 4px;
-  margin: 0 auto 12px;
+  margin: 0 auto 11px;
 }
 
 .modal-header-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 14px;
+  margin-bottom: 13px;
   padding-bottom: 8px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .modal-title {
-  font-size: 15px;
+  font-size: 14.5px;
   font-weight: 700;
   color: #FFFFFF;
 }
 
 .modal-close-btn {
-  background: var(--bg-surface);
+  background: rgba(255, 255, 255, 0.06);
   border: none;
   color: var(--text-secondary);
   width: 26px;
@@ -1033,7 +1087,7 @@ body {
 }
 
 .modal-close-btn:hover {
-  background: var(--bg-surface-hover);
+  background: rgba(255, 255, 255, 0.12);
   color: #FFFFFF;
 }
 
@@ -1043,18 +1097,18 @@ body {
   bottom: 24px;
   background: #121826;
   color: #FFFFFF;
-  padding: 10px 18px;
+  padding: 9px 17px;
   border-radius: 12px;
   border: 1px solid rgba(56, 189, 248, 0.35);
-  font-size: 12.5px;
+  font-size: 12px;
   font-weight: 600;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
   display: none;
   z-index: 200;
-  animation: toastFade 0.25s ease-out;
+  animation: toastFade 0.22s ease-out;
 }
 
 @keyframes toastFade {
-  from { opacity: 0; transform: translateY(12px); }
+  from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 }
