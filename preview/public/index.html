@@ -9,6 +9,8 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="apple-touch-icon" href="app_logo.png">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -123,10 +125,25 @@
           <span>Smart Location & Power Saver</span>
         </div>
 
-        <!-- Hero Radar Card -->
+        <!-- Hero Radar & Live Map Card -->
         <section class="card-dark">
+          <div class="gps-hud-bar">
+            <div class="gps-status-chip" id="gpsStatusChip">
+              <span class="gps-dot"></span>
+              <span id="gpsStatusText">GPS: Simulated</span>
+            </div>
+            <div style="display:flex; gap:6px; align-items:center;">
+              <button class="gps-enable-btn" id="enableGpsBtn" title="Enable Browser Location Service">Enable GPS</button>
+              <div class="hud-view-switch">
+                <button class="hud-view-btn active" id="viewRadarBtn">Radar</button>
+                <button class="hud-view-btn" id="viewMapBtn">Map</button>
+              </div>
+            </div>
+          </div>
+
           <div class="radar-box">
             <canvas id="radarCanvas"></canvas>
+            <div id="liveMapContainer" class="live-map-container" style="display:none;"></div>
           </div>
           <div class="geofence-status-banner" id="geoBanner">
             <span>🟢</span> INSIDE HOME SAFE ZONE • SENSORS PAUSED

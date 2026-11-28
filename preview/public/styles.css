@@ -406,23 +406,145 @@ body {
 }
 
 /* ══════════════════════════════════════════════════
-   Radar Box
+   Radar & Live Map HUD Box
 ══════════════════════════════════════════════════ */
+.gps-hud-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.gps-status-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 99px;
+  background: rgba(56, 189, 248, 0.1);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #7DD3FC;
+}
+
+.gps-status-chip.live {
+  background: rgba(48, 209, 88, 0.12);
+  border-color: rgba(48, 209, 88, 0.35);
+  color: #4ADE80;
+}
+
+.gps-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 8px currentColor;
+  animation: pulseLive 1.8s infinite ease-in-out;
+}
+
+.gps-enable-btn {
+  padding: 4px 10px;
+  border-radius: 99px;
+  border: 1px solid rgba(139, 92, 246, 0.45);
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(139, 92, 246, 0.25));
+  color: #E0E7FF;
+  font-size: 10.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.gps-enable-btn:hover {
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.35), rgba(139, 92, 246, 0.4));
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.3);
+}
+
+.hud-view-switch {
+  display: flex;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 99px;
+  padding: 2px;
+}
+
+.hud-view-btn {
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 99px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.hud-view-btn.active {
+  background: linear-gradient(135deg, #2563EB, #7C3AED);
+  color: #FFFFFF;
+  box-shadow: 0 2px 8px rgba(56, 189, 248, 0.3);
+}
+
 .radar-box {
   width: 100%;
-  height: 168px;
+  height: 215px;
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: radial-gradient(circle at center, rgba(0,194,168,0.1) 0%, transparent 70%);
-  border-radius: 14px;
+  background: radial-gradient(circle at center, rgba(56, 189, 248, 0.09) 0%, rgba(8, 11, 22, 0.9) 75%);
+  border: 1px solid rgba(56, 189, 248, 0.18);
+  border-radius: 16px;
   overflow: hidden;
+  box-shadow: inset 0 0 28px rgba(0, 0, 0, 0.65);
 }
 
 #radarCanvas {
   width: 100%;
   height: 100%;
-  border-radius: 12px;
+  border-radius: 14px;
+}
+
+.live-map-container {
+  width: 100%;
+  height: 100%;
+  background: #070B16;
+  z-index: 1;
+}
+
+.leaflet-container {
+  background: #070B16 !important;
+  font-family: "Inter", sans-serif !important;
+}
+
+.map-picker-box {
+  width: 100%;
+  height: 250px;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  background: #070B16;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.6);
+}
+
+.trinetra-pulse-pin {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #38BDF8;
+  border: 2.5px solid #FFFFFF;
+  box-shadow: 0 0 14px #38BDF8, 0 0 28px rgba(56, 189, 248, 0.7);
+}
+
+.trinetra-user-pin {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #30D158;
+  border: 2px solid #FFFFFF;
+  box-shadow: 0 0 14px #30D158, 0 0 24px rgba(48, 209, 88, 0.8);
 }
 
 /* Geofence Status */

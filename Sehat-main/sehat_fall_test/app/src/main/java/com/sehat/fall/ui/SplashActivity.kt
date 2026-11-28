@@ -73,6 +73,7 @@ class SplashActivity : Activity() {
                 setStroke((1.5f * density).toInt(), Color.parseColor("#5538BDF8"))
             }
             background = bg
+            clipToOutline = true
             elevation = 16f * density
             alpha = 0f
             scaleX = 0.5f
@@ -82,7 +83,6 @@ class SplashActivity : Activity() {
         val logoImg = ImageView(this).apply {
             setImageResource(R.drawable.app_logo)
             scaleType = ImageView.ScaleType.CENTER_CROP
-            clipToOutline = true
         }
         logoCard.addView(logoImg, FrameLayout.LayoutParams(
             FrameLayout.LayoutParams.MATCH_PARENT,
@@ -94,8 +94,9 @@ class SplashActivity : Activity() {
         // Brand Wordmark
         val brandTitle = TextView(this).apply {
             text = "TRINETRA"
-            textSize = 30f
-            letterSpacing = 0.28f
+            textSize = 28f
+            letterSpacing = 0.20f
+            maxLines = 1
             setTypeface(typeface, Typeface.BOLD)
             setTextColor(Color.WHITE)
             gravity = Gravity.CENTER
@@ -103,13 +104,17 @@ class SplashActivity : Activity() {
             translationY = 24f * density
             setPadding(0, (24 * density).toInt(), 0, 0)
         }
-        centerCol.addView(brandTitle)
+        centerCol.addView(brandTitle, LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        ))
 
         // Tagline
         val tagline = TextView(this).apply {
             text = "AI-ASSISTED INTELLIGENT SAFETY"
-            textSize = 11f
-            letterSpacing = 0.22f
+            textSize = 10.5f
+            letterSpacing = 0.14f
+            maxLines = 1
             setTypeface(typeface, Typeface.BOLD)
             setTextColor(Color.parseColor("#38BDF8"))
             gravity = Gravity.CENTER
@@ -117,7 +122,10 @@ class SplashActivity : Activity() {
             translationY = 18f * density
             setPadding(0, (8 * density).toInt(), 0, 0)
         }
-        centerCol.addView(tagline)
+        centerCol.addView(tagline, LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        ))
 
         // Sleek progress bar track & animated fill
         val trackWidth = (140 * density).toInt()
@@ -145,10 +153,13 @@ class SplashActivity : Activity() {
         })
 
         val centerParams = FrameLayout.LayoutParams(
-            FrameLayout.LayoutParams.WRAP_CONTENT,
+            FrameLayout.LayoutParams.MATCH_PARENT,
             FrameLayout.LayoutParams.WRAP_CONTENT,
             Gravity.CENTER
-        )
+        ).apply {
+            leftMargin = (24 * density).toInt()
+            rightMargin = (24 * density).toInt()
+        }
         root.addView(centerCol, centerParams)
 
         // Footer privacy note

@@ -63,6 +63,12 @@
     relativeRelation: localStorage.getItem('sehat_relative_relation') || 'Spouse',
     relativePhone: localStorage.getItem('sehat_relative_phone') || '+1 (555) 234-5678',
     homeCoords: localStorage.getItem('sehat_home_coords') || '28.6139° N, 77.2090° E',
+    homeLat: parseFloat(localStorage.getItem('trinetra_home_lat') || '28.6139'),
+    homeLng: parseFloat(localStorage.getItem('trinetra_home_lng') || '77.2090'),
+    userLat: parseFloat(localStorage.getItem('trinetra_home_lat') || '28.6139') + 0.00012,
+    userLng: parseFloat(localStorage.getItem('trinetra_home_lng') || '77.2090') + 0.00014,
+    gpsAccuracy: 12,
+    isLiveGps: false,
     homeRadius: parseInt(localStorage.getItem('sehat_home_radius') || '100', 10),
     isLocationActive: localStorage.getItem('sehat_location_active') !== 'false',
     isMonitoring: localStorage.getItem('sehat_monitoring_active') !== 'false',
@@ -164,14 +170,198 @@
   }
 
   // ==========================================================================
-  // 3. Tab 1: Smart Location & Radar Pulse
+  // 3. Tab 1: High-Graphics Tactical Radar HUD, Live GPS & Interactive Map
   // ==========================================================================
   const radarCanvas = document.getElementById('radarCanvas');
   const rCtx = radarCanvas ? radarCanvas.getContext('2d') : null;
+  const liveMapContainer = document.getElementById('liveMapContainer');
+  const viewRadarBtn = document.getElementById('viewRadarBtn');
+  const viewMapBtn = document.getElementById('viewMapBtn');
+  const enableGpsBtn = document.getElementById('enableGpsBtn');
+  const gpsStatusChip = document.getElementById('gpsStatusChip');
+  const gpsStatusText = document.getElementById('gpsStatusText');
+
   let radarAngle = 0;
+  let pulsePhase = 0;
+  let hudMode = 'radar'; // 'radar' | 'map'
+  let heroMap = null;
+  let heroHomeMarker = null;
+  let heroUserMarker = null;
+  let heroRadiusCircle = null;
+  let gpsWatchId = null;
+
+  // Floating telemetry particles for high-graphics HUD
+  const hudParticles = Array.from({ length: 18 }, () => ({
+    angle: Math.random() * Math.PI * 2,
+    dist: 0.25 + Math.random() * 0.7,
+    speed: (Math.random() - 0.5) * 0.006,
+    size: 1.2 + Math.random() * 1.6,
+    alpha: 0.25 + Math.random() * 0.5
+  }));
+
+  function formatCoords(lat, lng) {
+    const ns = lat >= 0 ? 'N' : 'S';
+    const ew = lng >= 0 ? 'E' : 'W';
+    return `${Math.abs(lat).toFixed(4)}° ${ns}, ${Math.abs(lng).toFixed(4)}° ${ew}`;
+  }
+
+  function calcDistanceMeters(lat1, lon1, lat2, lon2) {
+    const R = 6371000;
+    const toRad = d => (d * Math.PI) / 180;
+    const dLat = toRad(lat2 - lat1);
+    const dLon = toRad(lon2 - lon1);
+    const a =
+      Math.sin(dLat / 2) ** 2 +
+      Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  }
+
+  function updateDistanceAndZoneUI() {
+    const dist = Math.round(calcDistanceMeters(state.userLat, state.userLng, state.homeLat, state.homeLng));
+    const inside = dist <= state.homeRadius;
+    if (homeCoordsText) homeCoordsText.textContent = state.homeCoords;
+    if (homeDistText) {
+      homeDistText.textContent = inside
+        ? `${dist} m • Inside Safe Zone`
+        : `${dist} m • Outside Safe Zone`;
+      homeDistText.style.color = inside ? '#38BDF8' : '#FFB340';
+    }
+    if (geoBanner && state.isLocationActive) {
+      if (inside) {
+        geoBanner.innerHTML = '<span>🟢</span> INSIDE HOME SAFE ZONE • SENSORS PAUSED';
+        geoBanner.style.color = '#30D158';
+      } else {
+        geoBanner.innerHTML = '<span>🛡️</span> OUTSIDE SAFE ZONE • 100 Hz AI ACTIVE';
+        geoBanner.style.color = '#38BDF8';
+      }
+    }
+    syncHeroMap();
+  }
+
+  function initHeroMap() {
+    if (heroMap || !liveMapContainer || typeof L === 'undefined') return;
+    heroMap = L.map(liveMapContainer, {
+      zoomControl: false,
+      attributionControl: false
+    }).setView([state.homeLat, state.homeLng], 17);
+
+    const tiles = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+      subdomains: 'abcd',
+      maxZoom: 20
+    }).addTo(heroMap);
+
+    tiles.on('tileerror', () => {
+      L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+        maxZoom: 19
+      }).addTo(heroMap);
+    });
+
+    const homeIcon = L.divIcon({
+      className: '',
+      html: '<div class="trinetra-pulse-pin"></div>',
+      iconSize: [16, 16],
+      iconAnchor: [8, 8]
+    });
+    const userIcon = L.divIcon({
+      className: '',
+      html: '<div class="trinetra-user-pin"></div>',
+      iconSize: [14, 14],
+      iconAnchor: [7, 7]
+    });
+
+    heroRadiusCircle = L.circle([state.homeLat, state.homeLng], {
+      radius: state.homeRadius,
+      color: '#38BDF8',
+      weight: 1.5,
+      fillColor: '#38BDF8',
+      fillOpacity: 0.14
+    }).addTo(heroMap);
+
+    heroHomeMarker = L.marker([state.homeLat, state.homeLng], { icon: homeIcon }).addTo(heroMap);
+    heroUserMarker = L.marker([state.userLat, state.userLng], { icon: userIcon }).addTo(heroMap);
+  }
+
+  function syncHeroMap() {
+    if (!heroMap) return;
+    if (heroHomeMarker) heroHomeMarker.setLatLng([state.homeLat, state.homeLng]);
+    if (heroUserMarker) heroUserMarker.setLatLng([state.userLat, state.userLng]);
+    if (heroRadiusCircle) {
+      heroRadiusCircle.setLatLng([state.homeLat, state.homeLng]);
+      heroRadiusCircle.setRadius(state.homeRadius);
+    }
+    const bounds = heroRadiusCircle ? heroRadiusCircle.getBounds() : L.latLngBounds([[state.homeLat, state.homeLng]]);
+    bounds.extend([state.userLat, state.userLng]);
+    heroMap.fitBounds(bounds, { padding: [22, 22], maxZoom: 17, animate: true });
+  }
+
+  function setHudMode(mode) {
+    hudMode = mode;
+    if (!radarCanvas || !liveMapContainer) return;
+    if (mode === 'map') {
+      radarCanvas.style.display = 'none';
+      liveMapContainer.style.display = 'block';
+      viewMapBtn && viewMapBtn.classList.add('active');
+      viewRadarBtn && viewRadarBtn.classList.remove('active');
+      initHeroMap();
+      setTimeout(() => {
+        if (heroMap) {
+          heroMap.invalidateSize();
+          syncHeroMap();
+        }
+      }, 60);
+    } else {
+      liveMapContainer.style.display = 'none';
+      radarCanvas.style.display = 'block';
+      viewRadarBtn && viewRadarBtn.classList.add('active');
+      viewMapBtn && viewMapBtn.classList.remove('active');
+      resizeRadar();
+    }
+  }
+
+  if (viewRadarBtn && viewMapBtn) {
+    viewRadarBtn.addEventListener('click', () => setHudMode('radar'));
+    viewMapBtn.addEventListener('click', () => setHudMode('map'));
+  }
+
+  function enableLiveGps(silent) {
+    if (!navigator.geolocation) {
+      if (!silent) showToast('Geolocation not supported in this browser');
+      return;
+    }
+    if (gpsStatusText) gpsStatusText.textContent = 'GPS: Acquiring...';
+    if (gpsWatchId !== null) navigator.geolocation.clearWatch(gpsWatchId);
+
+    gpsWatchId = navigator.geolocation.watchPosition(
+      (pos) => {
+        state.userLat = pos.coords.latitude;
+        state.userLng = pos.coords.longitude;
+        state.gpsAccuracy = Math.round(pos.coords.accuracy || 10);
+        state.isLiveGps = true;
+        if (gpsStatusChip) gpsStatusChip.classList.add('live');
+        if (gpsStatusText) gpsStatusText.textContent = `LIVE GPS (±${state.gpsAccuracy}m)`;
+        if (enableGpsBtn) enableGpsBtn.textContent = 'GPS Active';
+        updateDistanceAndZoneUI();
+        if (heroMap) heroMap.panTo([state.userLat, state.userLng], { animate: true });
+      },
+      (err) => {
+        if (!silent) {
+          showToast('Location permission denied — using simulated GPS');
+        }
+        if (gpsStatusText) gpsStatusText.textContent = 'GPS: Simulated';
+      },
+      { enableHighAccuracy: true, maximumAge: 5000, timeout: 10000 }
+    );
+  }
+
+  if (enableGpsBtn) {
+    enableGpsBtn.addEventListener('click', () => {
+      enableLiveGps(false);
+      setHudMode('map');
+    });
+  }
 
   function resizeRadar() {
-    if (!radarCanvas) return;
+    if (!radarCanvas || !radarCanvas.parentElement) return;
     radarCanvas.width = radarCanvas.parentElement.clientWidth;
     radarCanvas.height = radarCanvas.parentElement.clientHeight;
   }
@@ -179,79 +369,171 @@
   resizeRadar();
 
   function drawRadar() {
-    if (!rCtx) return;
+    if (!rCtx || hudMode !== 'radar') {
+      requestAnimationFrame(drawRadar);
+      return;
+    }
     const w = radarCanvas.width;
     const h = radarCanvas.height;
     const cx = w / 2;
     const cy = h / 2;
-    const maxR = Math.min(w, h) * 0.44;
+    const maxR = Math.min(w, h) * 0.43;
 
     rCtx.clearRect(0, 0, w, h);
 
-    // Background radial gradient
-    const bgGrad = rCtx.createRadialGradient(cx, cy, 10, cx, cy, maxR);
-    bgGrad.addColorStop(0, '#0F2347');
-    bgGrad.addColorStop(1, '#071226');
+    // 1. Tactical Grid Background
+    rCtx.strokeStyle = 'rgba(56, 189, 248, 0.05)';
+    rCtx.lineWidth = 1;
+    const gridStep = 22;
+    for (let x = (cx % gridStep); x < w; x += gridStep) {
+      rCtx.beginPath(); rCtx.moveTo(x, 0); rCtx.lineTo(x, h); rCtx.stroke();
+    }
+    for (let y = (cy % gridStep); y < h; y += gridStep) {
+      rCtx.beginPath(); rCtx.moveTo(0, y); rCtx.lineTo(w, y); rCtx.stroke();
+    }
+
+    // 2. Obsidian Radial Dome
+    const bgGrad = rCtx.createRadialGradient(cx, cy, 8, cx, cy, maxR);
+    bgGrad.addColorStop(0, 'rgba(30, 58, 138, 0.42)');
+    bgGrad.addColorStop(0.55, 'rgba(15, 23, 42, 0.65)');
+    bgGrad.addColorStop(1, 'rgba(7, 11, 22, 0.92)');
     rCtx.fillStyle = bgGrad;
     rCtx.beginPath();
     rCtx.arc(cx, cy, maxR, 0, Math.PI * 2);
     rCtx.fill();
 
-    // Concentric rings
-    rCtx.lineWidth = 1.2;
-    rCtx.strokeStyle = 'rgba(56, 189, 248, 0.25)';
-    for (let r = maxR * 0.25; r <= maxR; r += maxR * 0.25) {
+    // 3. Expanding Geofence Pulse Wave
+    pulsePhase = (pulsePhase + 0.012) % 1;
+    for (let p = 0; p < 2; p++) {
+      const f = (pulsePhase + p * 0.5) % 1;
+      rCtx.beginPath();
+      rCtx.arc(cx, cy, f * maxR, 0, Math.PI * 2);
+      rCtx.strokeStyle = state.isLocationActive
+        ? `rgba(48, 209, 88, ${(1 - f) * 0.45})`
+        : `rgba(255, 179, 64, ${(1 - f) * 0.35})`;
+      rCtx.lineWidth = 1.6;
+      rCtx.stroke();
+    }
+
+    // 4. Concentric Range Rings & Degree Ticks
+    rCtx.lineWidth = 1;
+    for (let i = 1; i <= 4; i++) {
+      const r = maxR * (i * 0.25);
+      rCtx.strokeStyle = i === 4 ? 'rgba(56, 189, 248, 0.45)' : 'rgba(56, 189, 248, 0.18)';
       rCtx.beginPath();
       rCtx.arc(cx, cy, r, 0, Math.PI * 2);
       rCtx.stroke();
     }
 
+    // Outer compass ticks
+    for (let deg = 0; deg < 360; deg += 15) {
+      const rad = (deg * Math.PI) / 180;
+      const inner = deg % 90 === 0 ? maxR - 7 : maxR - 3.5;
+      rCtx.beginPath();
+      rCtx.moveTo(cx + Math.cos(rad) * inner, cy + Math.sin(rad) * inner);
+      rCtx.lineTo(cx + Math.cos(rad) * maxR, cy + Math.sin(rad) * maxR);
+      rCtx.strokeStyle = deg % 90 === 0 ? 'rgba(139, 92, 246, 0.7)' : 'rgba(56, 189, 248, 0.28)';
+      rCtx.stroke();
+    }
+
     // Crosshairs
     rCtx.beginPath();
-    rCtx.moveTo(cx - maxR, cy);
-    rCtx.lineTo(cx + maxR, cy);
-    rCtx.moveTo(cx, cy - maxR);
-    rCtx.lineTo(cx, cy + maxR);
-    rCtx.strokeStyle = 'rgba(56, 189, 248, 0.15)';
+    rCtx.moveTo(cx - maxR, cy); rCtx.lineTo(cx + maxR, cy);
+    rCtx.moveTo(cx, cy - maxR); rCtx.lineTo(cx, cy + maxR);
+    rCtx.strokeStyle = 'rgba(56, 189, 248, 0.14)';
     rCtx.stroke();
 
+    // 5. Dual-Beam Radar Sweep + Phosphor Trail
     if (state.isLocationActive) {
-      // Radar sweep cone
       rCtx.save();
       rCtx.translate(cx, cy);
       rCtx.rotate(radarAngle);
 
-      const sweepGrad = rCtx.createRadialGradient(0, 0, 5, 0, 0, maxR);
-      sweepGrad.addColorStop(0, 'rgba(56, 189, 248, 0.45)');
+      const sweepGrad = rCtx.createRadialGradient(0, 0, 4, 0, 0, maxR);
+      sweepGrad.addColorStop(0, 'rgba(56, 189, 248, 0.5)');
+      sweepGrad.addColorStop(0.6, 'rgba(139, 92, 246, 0.22)');
       sweepGrad.addColorStop(1, 'rgba(56, 189, 248, 0)');
-
       rCtx.fillStyle = sweepGrad;
       rCtx.beginPath();
       rCtx.moveTo(0, 0);
-      rCtx.arc(0, 0, maxR, 0, Math.PI / 4);
+      rCtx.arc(0, 0, maxR, -0.55, 0);
       rCtx.closePath();
       rCtx.fill();
+
+      // Leading edge laser line
+      rCtx.beginPath();
+      rCtx.moveTo(0, 0);
+      rCtx.lineTo(maxR, 0);
+      rCtx.strokeStyle = 'rgba(125, 211, 252, 0.85)';
+      rCtx.lineWidth = 1.6;
+      rCtx.stroke();
       rCtx.restore();
 
-      radarAngle += 0.035;
+      radarAngle += 0.028;
     }
 
-    // Center Home Marker
+    // 6. Floating Telemetry Particles
+    hudParticles.forEach(pt => {
+      pt.angle += pt.speed;
+      const px = cx + Math.cos(pt.angle) * (pt.dist * maxR);
+      const py = cy + Math.sin(pt.angle) * (pt.dist * maxR);
+      rCtx.beginPath();
+      rCtx.arc(px, py, pt.size, 0, Math.PI * 2);
+      rCtx.fillStyle = `rgba(125, 211, 252, ${pt.alpha})`;
+      rCtx.fill();
+    });
+
+    // 7. Compute User Position Offset on Radar
+    const distM = calcDistanceMeters(state.userLat, state.userLng, state.homeLat, state.homeLng);
+    const ratio = Math.min(0.88, distM / Math.max(state.homeRadius, 50));
+    const bearing = Math.atan2(state.userLng - state.homeLng, state.userLat - state.homeLat);
+    const ux = cx + Math.sin(bearing) * ratio * maxR;
+    const uy = cy - Math.cos(bearing) * ratio * maxR;
+
+    // Tether line between Home and User
     rCtx.beginPath();
-    rCtx.arc(cx, cy, 6, 0, Math.PI * 2);
+    rCtx.setLineDash([3, 3]);
+    rCtx.moveTo(cx, cy);
+    rCtx.lineTo(ux, uy);
+    rCtx.strokeStyle = 'rgba(48, 209, 88, 0.55)';
+    rCtx.lineWidth = 1.2;
+    rCtx.stroke();
+    rCtx.setLineDash([]);
+
+    // Home Center Beacon
+    rCtx.beginPath();
+    rCtx.arc(cx, cy, 10, 0, Math.PI * 2);
+    rCtx.fillStyle = 'rgba(56, 189, 248, 0.22)';
+    rCtx.fill();
+    rCtx.beginPath();
+    rCtx.arc(cx, cy, 5.5, 0, Math.PI * 2);
     rCtx.fillStyle = '#38BDF8';
     rCtx.fill();
     rCtx.lineWidth = 2;
     rCtx.strokeStyle = '#FFFFFF';
     rCtx.stroke();
 
-    // User pin marker
-    const ux = cx + 18;
-    const uy = cy - 14;
+    // User Live Beacon
     rCtx.beginPath();
-    rCtx.arc(ux, uy, 5, 0, Math.PI * 2);
-    rCtx.fillStyle = '#10B981';
+    rCtx.arc(ux, uy, 8 + Math.sin(pulsePhase * Math.PI * 2) * 2.5, 0, Math.PI * 2);
+    rCtx.fillStyle = 'rgba(48, 209, 88, 0.25)';
     rCtx.fill();
+    rCtx.beginPath();
+    rCtx.arc(ux, uy, 4.5, 0, Math.PI * 2);
+    rCtx.fillStyle = '#30D158';
+    rCtx.fill();
+
+    // 8. Corner HUD Telemetry Labels
+    rCtx.fillStyle = 'rgba(148, 163, 184, 0.75)';
+    rCtx.font = '600 9.5px Inter, sans-serif';
+    rCtx.textAlign = 'left';
+    rCtx.fillText(`ZONE ${state.homeRadius}m`, 10, 16);
+    rCtx.textAlign = 'right';
+    rCtx.fillStyle = state.isLiveGps ? '#4ADE80' : '#7DD3FC';
+    rCtx.fillText(state.isLiveGps ? 'SAT LOCK' : 'HUD SIM', w - 10, 16);
+    rCtx.fillStyle = 'rgba(148, 163, 184, 0.65)';
+    rCtx.textAlign = 'left';
+    rCtx.fillText(`DIST ${Math.round(distM)}m`, 10, h - 9);
 
     requestAnimationFrame(drawRadar);
   }
@@ -293,6 +575,7 @@
       state.homeRadius = parseInt(e.target.value, 10);
       radiusValueLabel.textContent = `${state.homeRadius} meters`;
       localStorage.setItem('sehat_home_radius', state.homeRadius);
+      updateDistanceAndZoneUI();
     });
   }
 
@@ -305,21 +588,27 @@
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
           (pos) => {
-            const lat = pos.coords.latitude.toFixed(4);
-            const lng = pos.coords.longitude.toFixed(4);
-            state.homeCoords = `${lat}° N, ${lng}° E`;
+            state.homeLat = pos.coords.latitude;
+            state.homeLng = pos.coords.longitude;
+            state.userLat = pos.coords.latitude;
+            state.userLng = pos.coords.longitude;
+            state.homeCoords = formatCoords(state.homeLat, state.homeLng);
+            localStorage.setItem('trinetra_home_lat', state.homeLat);
+            localStorage.setItem('trinetra_home_lng', state.homeLng);
             localStorage.setItem('sehat_home_coords', state.homeCoords);
-            if (homeCoordsText) homeCoordsText.textContent = state.homeCoords;
-            if (homeDistText) homeDistText.textContent = 'Distance to Home: 0 meters (Current Pin)';
-            showToast('GPS Location Saved as Safe Home Zone!');
+            enableLiveGps(true);
+            updateDistanceAndZoneUI();
+            showToast('Live GPS Location Saved as Safe Home Zone!');
           },
           () => {
-            state.homeCoords = '28.6142° N, 77.2088° E';
+            state.homeLat = 28.6139;
+            state.homeLng = 77.2090;
+            state.homeCoords = formatCoords(state.homeLat, state.homeLng);
             localStorage.setItem('sehat_home_coords', state.homeCoords);
-            if (homeCoordsText) homeCoordsText.textContent = state.homeCoords;
-            if (homeDistText) homeDistText.textContent = 'Distance to Home: 0 meters (Current Pin)';
+            updateDistanceAndZoneUI();
             showToast('Home location set to current coordinates!');
-          }
+          },
+          { enableHighAccuracy: true, timeout: 8000 }
         );
       } else {
         showToast('Home location updated!');
@@ -852,22 +1141,87 @@
     });
   }
 
-  // Map Picker Modal
+  // Interactive Dark-Mode Map Picker Modal
   const openMapBtn = document.getElementById('openMapBtn');
   if (openMapBtn) {
     openMapBtn.addEventListener('click', () => {
-      openSheet('Set Home Pin on Map', `
-        <div style="text-align:center; padding:12px 0;">
-          <div style="background:#131A29; border-radius:12px; height:180px; display:flex; flex-direction:column; align-items:center; justify-content:center; color:#38BDF8; font-size:13px; border:1px dashed #38BDF8; gap:8px;">
-            <div style="font-size:24px;">📍</div>
-            <div>Interactive Safe Zone Pin</div>
-            <div style="font-size:11px; color:#94A3B8;">Latitude: 28.6139 • Longitude: 77.2090</div>
+      let pickLat = state.homeLat;
+      let pickLng = state.homeLng;
+
+      openSheet('Pin Safe Home Zone on Map', `
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <div id="modalMapCoords" style="font-size:12px; font-weight:700; color:#38BDF8; background:rgba(56,189,248,0.1); border:1px solid rgba(56,189,248,0.25); padding:8px 12px; border-radius:10px; text-align:center;">
+            📍 ${formatCoords(pickLat, pickLng)} • Radius ${state.homeRadius}m
           </div>
-          <button class="btn-action btn-blue" onclick="document.getElementById('sheetOverlay').classList.remove('active');" style="margin-top:14px;">
+          <div id="modalLeafletMap" class="map-picker-box"></div>
+          <div style="font-size:11px; color:#94A3B8; text-align:center;">
+            Tap anywhere on the map or drag the glowing pin to set your home safe zone.
+          </div>
+          <button id="confirmMapPinBtn" class="btn-action btn-blue" style="margin-top:2px;">
             Confirm Safe Zone Pin
           </button>
         </div>
       `);
+
+      setTimeout(() => {
+        const mapEl = document.getElementById('modalLeafletMap');
+        const coordsEl = document.getElementById('modalMapCoords');
+        const confirmBtn = document.getElementById('confirmMapPinBtn');
+
+        if (mapEl && typeof L !== 'undefined') {
+          const pickerMap = L.map(mapEl, { zoomControl: true, attributionControl: false }).setView([pickLat, pickLng], 17);
+          L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            subdomains: 'abcd',
+            maxZoom: 20
+          }).addTo(pickerMap);
+
+          const pinIcon = L.divIcon({
+            className: '',
+            html: '<div class="trinetra-pulse-pin"></div>',
+            iconSize: [16, 16],
+            iconAnchor: [8, 8]
+          });
+
+          const pinCircle = L.circle([pickLat, pickLng], {
+            radius: state.homeRadius,
+            color: '#38BDF8',
+            weight: 1.5,
+            fillColor: '#38BDF8',
+            fillOpacity: 0.16
+          }).addTo(pickerMap);
+
+          const pinMarker = L.marker([pickLat, pickLng], { icon: pinIcon, draggable: true }).addTo(pickerMap);
+
+          function updatePin(lat, lng) {
+            pickLat = lat;
+            pickLng = lng;
+            pinMarker.setLatLng([lat, lng]);
+            pinCircle.setLatLng([lat, lng]);
+            if (coordsEl) coordsEl.textContent = `📍 ${formatCoords(lat, lng)} • Radius ${state.homeRadius}m`;
+          }
+
+          pickerMap.on('click', (ev) => updatePin(ev.latlng.lat, ev.latlng.lng));
+          pinMarker.on('dragend', () => {
+            const p = pinMarker.getLatLng();
+            updatePin(p.lat, p.lng);
+          });
+        }
+
+        if (confirmBtn) {
+          confirmBtn.addEventListener('click', () => {
+            state.homeLat = pickLat;
+            state.homeLng = pickLng;
+            state.homeCoords = formatCoords(pickLat, pickLng);
+            localStorage.setItem('trinetra_home_lat', state.homeLat);
+            localStorage.setItem('trinetra_home_lng', state.homeLng);
+            localStorage.setItem('sehat_home_coords', state.homeCoords);
+            updateDistanceAndZoneUI();
+            if (heroMap) heroMap.setView([state.homeLat, state.homeLng], 17, { animate: true });
+            closeSheet();
+            showToast('Safe Home Zone Pin Updated!');
+          });
+        }
+      }, 80);
     });
   }
 
