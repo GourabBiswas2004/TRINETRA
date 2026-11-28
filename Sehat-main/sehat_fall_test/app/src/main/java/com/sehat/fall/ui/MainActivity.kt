@@ -182,15 +182,16 @@ class MainActivity : Activity() {
         }
 
         val titleView = TextView(this).apply {
-            text = "SEHAT-ERS"
+            text = "TRINETRA"
             textSize = 26f
+            letterSpacing = 0.08f
             setTypeface(typeface, Typeface.BOLD)
             setTextColor(Color.WHITE)
         }
         headerTextCol.addView(titleView)
 
         val subtitleView = TextView(this).apply {
-            text = "Edge-First Safe Fall Protection"
+            text = "AI-Assisted Fall & Safety Shield"
             textSize = 13f
             setTextColor(Color.parseColor("#94A3B8"))
             setPadding(0, 2, 0, 0)
@@ -733,6 +734,7 @@ class MainActivity : Activity() {
 
             mainTabContainer.visibility = View.VISIBLE
             testingTabContainer.visibility = View.GONE
+            animateTabEntrance(mainTabContainer)
         } else {
             tabTestingBtn.setBackgroundResource(R.drawable.bg_tab_active)
             tabTestingBtn.setTextColor(Color.WHITE)
@@ -741,8 +743,25 @@ class MainActivity : Activity() {
 
             testingTabContainer.visibility = View.VISIBLE
             mainTabContainer.visibility = View.GONE
+            animateTabEntrance(testingTabContainer)
         }
         updateDashboard()
+    }
+
+    private fun animateTabEntrance(container: LinearLayout) {
+        val density = resources.displayMetrics.density
+        for (i in 0 until container.childCount) {
+            val child = container.getChildAt(i)
+            child.alpha = 0f
+            child.translationY = 18f * density
+            child.animate()
+                .alpha(1f)
+                .translationY(0f)
+                .setStartDelay((i * 45).toLong())
+                .setDuration(320)
+                .setInterpolator(android.view.animation.DecelerateInterpolator())
+                .start()
+        }
     }
 
     private fun toggleLocationProtection() {

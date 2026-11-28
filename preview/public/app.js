@@ -1,9 +1,59 @@
 // ==========================================================================
-// SEHAT-ERS • Mobile Frontend Controller & Real-Time Fall Engine
+// TRINETRA • Mobile Frontend Controller & Real-Time Fall Engine
 // ==========================================================================
 
 (function() {
   'use strict';
+
+  // ==========================================================================
+  // 0. Premium Startup Splash Screen Animation Controller
+  // ==========================================================================
+  const splashScreen = document.getElementById('splashScreen');
+  const replayIntroBtn = document.getElementById('replayIntroBtn');
+
+  function triggerDashboardEntrance() {
+    const mainTab = document.getElementById('tabMainContent');
+    const testTab = document.getElementById('tabTestingContent');
+    [mainTab, testTab].forEach(el => {
+      if (!el) return;
+      el.classList.remove('animate-in');
+      void el.offsetWidth;
+      el.classList.add('animate-in');
+    });
+  }
+
+  function playSplashAnimation() {
+    if (!splashScreen) return;
+    splashScreen.classList.remove('splash-hide', 'splash-gone');
+    // Restart CSS animations by cloning inner node
+    const clone = splashScreen.cloneNode(true);
+    splashScreen.parentNode.replaceChild(clone, splashScreen);
+    const activeSplash = document.getElementById('splashScreen');
+
+    setTimeout(() => {
+      if (!activeSplash) return;
+      activeSplash.classList.add('splash-hide');
+      triggerDashboardEntrance();
+      setTimeout(() => {
+        activeSplash.classList.add('splash-gone');
+      }, 560);
+    }, 2200);
+  }
+
+  // Run splash on initial startup
+  if (splashScreen) {
+    setTimeout(() => {
+      splashScreen.classList.add('splash-hide');
+      triggerDashboardEntrance();
+      setTimeout(() => {
+        splashScreen.classList.add('splash-gone');
+      }, 560);
+    }, 2200);
+  }
+
+  if (replayIntroBtn) {
+    replayIntroBtn.addEventListener('click', playSplashAnimation);
+  }
 
   // ==========================================================================
   // 1. Persistent State (LocalStorage + Fallbacks)
@@ -94,11 +144,17 @@
       tabTestingBtn.classList.remove('active');
       tabMainContent.style.display = 'block';
       tabTestingContent.style.display = 'none';
+      tabMainContent.classList.remove('animate-in');
+      void tabMainContent.offsetWidth;
+      tabMainContent.classList.add('animate-in');
     } else {
       tabTestingBtn.classList.add('active');
       tabMainBtn.classList.remove('active');
       tabTestingContent.style.display = 'block';
       tabMainContent.style.display = 'none';
+      tabTestingContent.classList.remove('animate-in');
+      void tabTestingContent.offsetWidth;
+      tabTestingContent.classList.add('animate-in');
     }
   }
 

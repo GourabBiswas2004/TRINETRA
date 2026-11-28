@@ -61,7 +61,7 @@ class AboutActivity : Activity() {
             scrollCol,
             "• All motion sensor analysis (accelerometer and gyroscope) executes 100% locally on your device.\n" +
             "• No raw sensor stream or telemetry ever leaves your phone.\n" +
-            "• Phase 1 of SEHAT-ERS contains NO internet permission and NO cloud connectivity.\n" +
+            "• Phase 1 of TRINETRA contains NO internet permission and NO cloud connectivity.\n" +
             "• All event logs and traces are stored strictly on device storage."
         )
 
@@ -72,7 +72,7 @@ class AboutActivity : Activity() {
             "• Laboratory Trained: The fall detection model was trained on simulated fall data from 66 healthy young adult volunteers with the handset placed in a trouser pocket.\n" +
             "• False Alert Profile: False alerts occur predominantly during vehicular transitions—specifically when stepping into or stepping out of a car (accounting for approximately 8% and 6% of such movements respectively during testing).\n" +
             "• Population Validation: This system has NOT been validated for real-world unconstrained falls or frail elderly populations.\n" +
-            "• NOT A MEDICAL DEVICE: SEHAT-ERS is an edge-first emergency prototype for personal safety research. It is not an FDA/CE-cleared medical device and should not replace primary emergency care systems."
+            "• NOT A MEDICAL DEVICE: TRINETRA is an edge-first emergency prototype for personal safety research. It is not an FDA/CE-cleared medical device and should not replace primary emergency care systems."
         )
 
         // 3. Sensor Requirements

@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SEHAT-ERS • Edge-First Fall Protection</title>
+  <title>TRINETRA • AI-Assisted Intelligent Safety</title>
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#0B0F19">
+  <meta name="theme-color" content="#080B16">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="apple-touch-icon" href="app_logo.png">
@@ -17,13 +17,37 @@
   <header class="preview-header-bar">
     <div class="preview-badge">
       <span class="pulse-dot"></span>
-      <span>SEHAT Health-Tech System (v1.0)</span>
+      <span>TRINETRA Intelligent Safety (v2.0)</span>
     </div>
-    <button class="mode-toggle-btn" id="toggleFrameBtn">Toggle Phone Frame</button>
+    <div style="display:flex; gap:8px; align-items:center;">
+      <button class="mode-toggle-btn" id="replayIntroBtn" title="Replay Startup Logo Animation">Replay Intro</button>
+      <button class="mode-toggle-btn" id="toggleFrameBtn">Expand View</button>
+    </div>
   </header>
 
   <!-- Device Shell (Mobile Mockup) -->
   <main class="device-shell" id="deviceShell">
+
+    <!-- Premium Startup Splash Screen -->
+    <div class="splash-screen" id="splashScreen" aria-hidden="false">
+      <div class="splash-aura"></div>
+      <div class="splash-orbit splash-orbit-1"></div>
+      <div class="splash-orbit splash-orbit-2"></div>
+      <div class="splash-orbit splash-orbit-3"></div>
+      <div class="splash-center">
+        <div class="splash-logo-wrap">
+          <div class="splash-logo-glow"></div>
+          <img src="app_logo.png" alt="TRINETRA Logo" class="splash-logo-img">
+          <div class="splash-logo-shine"></div>
+        </div>
+        <div class="splash-brand-title">TRINETRA</div>
+        <div class="splash-brand-tagline">AI-ASSISTED INTELLIGENT SAFETY</div>
+        <div class="splash-progress-track">
+          <div class="splash-progress-fill"></div>
+        </div>
+      </div>
+      <div class="splash-footer-note">EDGE-FIRST • ZERO CLOUD TELEMETRY</div>
+    </div>
     
     <!-- Dynamic Island Pill -->
     <div class="dynamic-island">
@@ -55,10 +79,10 @@
       <!-- Minimal Brand Header -->
       <header class="app-header-row">
         <div class="header-brand">
-          <img src="app_logo.png" alt="SEHAT-ERS Logo" class="app-logo-img">
+          <img src="app_logo.png" alt="TRINETRA Logo" class="app-logo-img">
           <div class="app-titles">
-            <h1 class="app-title-text">SEHAT-ERS</h1>
-            <span class="app-subtitle-text">Edge-First Safe Fall Protection</span>
+            <h1 class="app-title-text">TRINETRA</h1>
+            <span class="app-subtitle-text">AI-Assisted Fall &amp; Safety Shield</span>
           </div>
         </div>
         <div class="header-status-pill">

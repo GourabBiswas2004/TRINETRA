@@ -50,7 +50,7 @@ const server = http.createServer((req, res) => {
 
 server.listen(PORT, '0.0.0.0', () => {
   console.log(`\n======================================================`);
-  console.log(`🚀 SEHAT-ERS Live Interactive App Preview Server running!`);
+  console.log(`🚀 TRINETRA Live Interactive App Preview Server running!`);
   console.log(`👉 Open in your browser: http://localhost:${PORT}`);
   console.log(`======================================================\n`);
 });
